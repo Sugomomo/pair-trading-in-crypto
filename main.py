@@ -10,7 +10,7 @@ import utils
 
 import os
 from pathlib import Path
-os.chdir(r"C:/Users/Jiawe.JIAWEI/OneDrive/Desktop/Coding/Python/cryptostatarb")
+os.chdir(r"address")
 
 
 start = datetime(2015,1,1, tzinfo=pytz.utc)
