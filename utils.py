@@ -9,7 +9,7 @@ from datetime import timedelta  # for run sim purposes, check again
 from copy import deepcopy
 from collections import defaultdict
 from timeme import timeme
-os.chdir(r"C:/Users/Jiawe.JIAWEI/OneDrive/Desktop/Coding/Python/cryptostatarb")
+os.chdir(r"address")
 
 
 
