@@ -10,7 +10,7 @@ import utils
 
 import os
 from pathlib import Path
-os.chdir(r"address")
+os.chdir(r"C:/Users/Jiawe.JIAWEI/OneDrive/Desktop/Coding/Python/cryptostatarb")
 
 
 start = datetime(2020,1,1, tzinfo=pytz.utc)
@@ -109,8 +109,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-<<<<<<< HEAD
 
 #current work, but still missing a few pair due to exchange, date problem
-=======
->>>>>>> c9a0f4ea6840851e00cc808bd1753d27494e2cee
+#individual alpha are to be created
