@@ -4,6 +4,7 @@ import statsmodels.api as sm
 from itertools import combinations 
 from statsmodels.tsa.stattools import adfuller 
 from copy import deepcopy
+import matplotlib.pyplot as plt
 
 
 def train_test_split(log_prices:pd.DataFrame, train_start:str, train_end:str, test_start:str, test_end:str):
@@ -104,3 +105,16 @@ def run_pair(log_prices: pd.DataFrame,
         rank=rank_by
     )
     return pairs, train, test 
+
+"""
+def plot_spread(log_prices, pair, beta, train_start, train_end, test_start, test_end):
+    y, x = pair 
+    spread = log_prices[y] - beta * log_prices[x]
+    fig, ax = plt.subplots(2,1, figsize=(12,6), sharex=True)
+    spread.loc[train_start:train_end].plot(ax=ax[0],title=f'{y} ~ {x} | Train Spread')
+    ax[0].axhline(spread.loc[train_start:train_end].mean(), color='red',linestyle='--')
+    spread.loc[test_start:test_end].plot(ax=ax[1],title=f'{y} ~ {x} | Test Spread')
+    ax[1].axhline(spread.loc[train_start:train_end].mean(), color='red',linestyle='--')
+    plt.tight_layout()
+    plt.show()
+"""

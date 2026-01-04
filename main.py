@@ -12,9 +12,8 @@ import os
 from pathlib import Path
 os.chdir(r"/Users/jiawei/Desktop/Code/Python/cryptopairtrading")
 
-
-start = datetime(2020,1,1, tzinfo=pytz.utc)
-end = datetime(2025,1,1,tzinfo=pytz.utc)
+start = datetime(2020,1,1)
+end = datetime(2025,1,1)
 
 tickers = [
     "BTC/USDT","ETH/USDT","XRP/USDT","SOL/USDT","ADA/USDT","DOGE/USDT","HYPE/USDT","BCH/USDT","LINK/USDT","ZEC/USDT",
@@ -64,9 +63,10 @@ def get_history(ticker, start, end, timeframe ='1d', tries =0):
 
        
         df["datetime"] = pd.to_datetime(df["timestamp"], unit="ms", utc=True)
+        df = df[(df["datetime"] >= pd.Timestamp(start, tz="UTC")) &
+        (df["datetime"] <  pd.Timestamp(end, tz="UTC"))]
+        df["datetime"] = df["datetime"].dt.tz_convert(None)
         df = df.set_index("datetime").drop(columns="timestamp")
-        df = df.loc[(df.index >= start) & (df.index < end)]
-        df = df[~df.index.duplicated(keep="first")]
         return df
 
     except Exception as err:
@@ -106,6 +106,7 @@ def get_ticker_dfs(tickers,start,end):
 
 def main():
     from pairselect import run_pair
+    #from pairselect import plot_spread
     tickers_kept, ticker_dfs = get_ticker_dfs(tickers,start,end)
 
     log_prices = pd.concat(
@@ -127,6 +128,49 @@ def main():
         f"p={stats['adf_pvalue']:.4f}, "
         f"half-life={stats['half_life']:.1f} days"
     )
+    
+    pairs_df = (pd.DataFrame.from_dict(pairs, orient="index").rename_axis(index=["y","x"]).sort_values("adf_pvalue"))
+    pairs_df.to_csv('selected_pairs.csv')
+
+    selected_pairs = pairs
+    selected_assets = sorted(set([a for (y, x) in selected_pairs.keys() for a in (y, x)]))
+    test_start="2023-01-01"
+    test_end="2025-01-01"
+    dfs_for_alpha = {}
+    for t, df in ticker_dfs.items():
+        asset = t.split("/")[0]
+        if asset in selected_assets:
+            dfs_for_alpha[asset] = df[["close"]].copy()
+    from alpha1 import Alpha1
+    alpha1 = Alpha1(
+        insts=selected_assets,
+        dfs=dfs_for_alpha,
+        start=test_start,
+        end=test_end,
+        pairs=selected_pairs,
+        portfolio_vol=0.20,
+        entry_z=2.0,
+        exit_z=0.5,
+        lookback_mode="half_life",
+        fixed_lookback=60,
+        min_lookback=20,
+        max_lookback=180,
+        use_prev_close=True
+    )
+    df1 = alpha1.run_simulation()
+    print(df1["capital"].iloc[-1])
+
+
+    
+
+
+    """
+    example_pair = list(pairs.items())[:5] #top 5 pair 
+
+    for (pair, stats) in example_pair:
+        plot_spread(log_prices, pair, stats['beta'], train_start="2020-01-01",train_end="2022-12-31",test_start="2023-01-01",test_end="2025-01-01",)
+
+    """
 
 
 """
